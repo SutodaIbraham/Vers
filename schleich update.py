@@ -21,8 +21,9 @@ pd.set_option('display.max_columns', 500)
 filenames = glob.glob(r"I:\Arbeitsgruppen\Prozessdatendokumentation\PM_Fertigung\TSS-214\Schleich-EOL\CSV/*.csv")
 filenames.sort(key=os.path.getctime)
 Spalten = [ 'Text1', 'Ist', 'Soll',	'Minimum',	'Maximum',	'Einheit',	'IO_NIO']
-try:
-  for filename in filenames: 
+
+for filename in filenames: 
+    try:
       p = pd.read_csv(filename,sep = '\t', encoding='ISO 8859-1',  engine='python', header=None)[0].str.split(';', expand=True)
       
       if len(p.columns)<7:
@@ -76,7 +77,7 @@ try:
                     row.IO_NIO, row.SerNr, row.TestPlan, row.Inspector, row.Datum,
                     row.Zeit, row.OrderNr, row.Result, row.Ist_, row.L1, row.L2, row.L3)
           conn.commit()
-except Exception as Argument:
+    except Exception as Argument:
           filename1 = datetime.date.today() # filename1 erfasst das aktuelle Datum und die Uhrzeit 
           f = open(V.Schleich_EOL + filename1+ ".txt", "a") # f ist der Pfad von einer Textdatei
           f.write(str(Argument)) # in f wird die Uhrsache des Exceptions (das Argument) geschrieben
