@@ -11,6 +11,9 @@ import pandas as pd
 import pandas.io.sql
 import pyodbc
 import datetime
+import sys
+sys.path.append(r"C:\Users\ibraham\Variablen.py")
+import Variablen as V
 server = 'ltp077'
 db = 'TraceabilityTest'
 conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + db + ';Trusted_Connection=yes')
@@ -37,7 +40,7 @@ for filename in filenames:
       conn.commit()
  except Exception as Argument:
             filename1 = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
-            f = open("I:\Arbeitsgruppen\Traceability\Fehlerbehandlung\Wuchtanlage" + filename1+ ".txt", "a")
+            f = open(V.Wuchtanlage_Schenck + filename1+ ".txt", "a")
             f.write(f'{filename}\n')
             f.write(str(Argument))
             f.write(f'\n{row}\n')
