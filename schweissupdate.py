@@ -9,12 +9,14 @@ import glob #
 import pandas as pd 
 import pyodbc
 from datetime import datetime 
+import sys
+sys.path.append(r"C:\Users\ibraham\Variablen.py")
+import Variablen as V
 server = 'ltp077' 
 db = 'TraceabilityTest'
 conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + db + ';Trusted_Connection=yes')
 
 filenames = glob.glob("I:\Arbeitsgruppen\Prozessdatendokumentation\PM_Fertigung\TSS-214\CASTECH_Schweissanlage\Messdaten/*.csv")
-
 for filename in filenames:
     try:
      p = pd.read_csv(filename)
@@ -42,7 +44,7 @@ for filename in filenames:
        
     except Exception as Argument: 
           filename1 = datetime.now().strftime("%Y_%m_%d-%H_%M_%S") 
-          f = open("I:\Arbeitsgruppen\Traceability\Sutoda-Ibraham\Fehlerbehandlung\schweissanlage" + filename1+ ".txt", "a")
+          f = open(V.CASTECH_Schweissanlage + filename1+ ".txt", "a")
           f.write(f'{filename}\n')
           f.write(str(Argument)) 
           f.write(f'\n{row}\n')
