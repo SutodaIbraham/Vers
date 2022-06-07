@@ -11,20 +11,24 @@ import pandas as pd
 import pandas.io.sql
 import pyodbc
 from datetime import datetime
-
+server = 'ltp077'
+db = 'TraceabilityTest'
+conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + db + ';Trusted_Connection=yes')
+cursor = conn.cursor()
+import sys
+sys.path.append(r"C:\Users\ibraham\Variablen.py")
+import Variablen as V
 #I:\Arbeitsgruppen\Prozessdatendokumentation\PM_Fertigung\TSS-214\Meier_Impraegnieranlage\Statorplatz 01\_REZEPTDATEN_Gesammelt
 filenames = glob.glob(r"I:\Arbeitsgruppen\Prozessdatendokumentation\PM_Fertigung\TSS-214\Meier_Impraegnieranlage\Statorplatz 02\_REZEPTDATEN_Gesammelt/*.csv")
-filenames.sort(key=os.path.getctime)
-Dfs=[]
 
-for filename in filenames:
+filenames.sort(key=os.path.getctime)
+try:
+
+ for filename in filenames:
     p = pd.read_csv(filename, sep=";" )
     p['Materialnummer'] = os.path.basename(filename).split(".")[0].split("_")[0]
     p['Zeitstempel'] = os.path.basename(filename).split(".")[0].partition("_")[2]
-    
-    Dfs.append(p)
-dfs = pd.concat(Dfs, ignore_index=True)
-dfs.columns = ['Anlagentyp', 'Anlagennummer', 'Statorplatz', 'Rezepturdatensatz', 'Querschnitt', 'Kaltwiderstand',
+    p.columns = ['Anlagentyp', 'Anlagennummer', 'Statorplatz', 'Rezepturdatensatz', 'Querschnitt', 'Kaltwiderstand',
     'Toleranz_Kaltwiderstand', 'Stromdichte_Vorwärmen1', 'Temperatur_Vorwärmen1', 'Sollzeit_Vorwärmen1',  
     'Stromdichte_Vorwärmen2', 'Temperatur_Vorwärmen2','Sollzeit_Vorwärmen2', 'Stromdichte_Vorwärmen3',  
     'Temperatur_Vorwärmen3', 'Sollzeit_Vorwärmen3', 'Stromdichte_Heizen_unter_Harz1', 'Temperatur_Heizen_unter_Harz1',  
@@ -34,33 +38,29 @@ dfs.columns = ['Anlagentyp', 'Anlagennummer', 'Statorplatz', 'Rezepturdatensatz'
     'Eintauchposition', 'Vorwärmposition', 'Austachposition', 'Eintauchgeschwindigkeit', 'Austauchgeschwindigkeit',
     'Position_Absaugkabine', 'Verfahrgeschwindigkeit_allgemein', 'Ofenzeit', 'Materialnummer', 'Zeitstempel']
      
-dfs['Querschnitt'] = pd.to_numeric(dfs['Querschnitt'] .astype(str).str.replace(',', '.'), downcast='float')   
-dfs['Kaltwiderstand'] = pd.to_numeric(dfs['Kaltwiderstand'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Toleranz_Kaltwiderstand'] = pd.to_numeric(dfs['Toleranz_Kaltwiderstand'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Stromdichte_Vorwärmen1'] = pd.to_numeric(dfs['Stromdichte_Vorwärmen1'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Temperatur_Vorwärmen1'] = pd.to_numeric(dfs['Temperatur_Vorwärmen1'] .astype(str).str.replace(',', '.'), downcast='float')  
-dfs['Stromdichte_Vorwärmen2'] = pd.to_numeric(dfs['Stromdichte_Vorwärmen2'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Temperatur_Vorwärmen2'] = pd.to_numeric(dfs['Temperatur_Vorwärmen2'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Stromdichte_Vorwärmen3'] = pd.to_numeric(dfs['Stromdichte_Vorwärmen3'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Temperatur_Vorwärmen3'] = pd.to_numeric(dfs['Temperatur_Vorwärmen3'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Stromdichte_Heizen_unter_Harz1'] = pd.to_numeric(dfs['Stromdichte_Heizen_unter_Harz1'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Temperatur_Heizen_unter_Harz1'] = pd.to_numeric(dfs['Temperatur_Heizen_unter_Harz1'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Stromdichte_Heizen_unter_Harz2'] = pd.to_numeric(dfs['Stromdichte_Heizen_unter_Harz2'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Temperatur_Heizen_unter_Harz2'] = pd.to_numeric(dfs['Temperatur_Heizen_unter_Harz2'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Stromdichte_Abtropfen'] = pd.to_numeric(dfs['Stromdichte_Abtropfen'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Temperatur_Abtropfen'] = pd.to_numeric(dfs['Temperatur_Abtropfen'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Stromdichte_Härten1'] = pd.to_numeric(dfs['Stromdichte_Härten1'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Temperatur_Härten1'] = pd.to_numeric(dfs['Temperatur_Härten1'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Stromdichte_Härten2'] = pd.to_numeric(dfs['Stromdichte_Härten2'] .astype(str).str.replace(',', '.'), downcast='float')
-dfs['Temperatur_Härten2'] = pd.to_numeric(dfs['Temperatur_Härten2'] .astype(str).str.replace(',', '.'), downcast='float') 
-dfs['Zeitstempel'] = pd.to_datetime(dfs['Zeitstempel'].astype(str).str.replace('_', '-'),format='%d-%m-%Y')
-server = 'ltp077'
-db = 'TraceabilityTest'
-conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + db + ';Trusted_Connection=yes')
-cursor = conn.cursor()
-for row in dfs.itertuples():
-    try:
-     cursor.execute('''
+    p['Querschnitt'] = pd.to_numeric(p['Querschnitt'] .astype(str).str.replace(',', '.'), downcast='float')   
+    p['Kaltwiderstand'] = pd.to_numeric(p['Kaltwiderstand'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Toleranz_Kaltwiderstand'] = pd.to_numeric(p['Toleranz_Kaltwiderstand'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Stromdichte_Vorwärmen1'] = pd.to_numeric(p['Stromdichte_Vorwärmen1'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Temperatur_Vorwärmen1'] = pd.to_numeric(p['Temperatur_Vorwärmen1'] .astype(str).str.replace(',', '.'), downcast='float')  
+    p['Stromdichte_Vorwärmen2'] = pd.to_numeric(p['Stromdichte_Vorwärmen2'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Temperatur_Vorwärmen2'] = pd.to_numeric(p['Temperatur_Vorwärmen2'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Stromdichte_Vorwärmen3'] = pd.to_numeric(p['Stromdichte_Vorwärmen3'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Temperatur_Vorwärmen3'] = pd.to_numeric(p['Temperatur_Vorwärmen3'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Stromdichte_Heizen_unter_Harz1'] = pd.to_numeric(p['Stromdichte_Heizen_unter_Harz1'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Temperatur_Heizen_unter_Harz1'] = pd.to_numeric(p['Temperatur_Heizen_unter_Harz1'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Stromdichte_Heizen_unter_Harz2'] = pd.to_numeric(p['Stromdichte_Heizen_unter_Harz2'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Temperatur_Heizen_unter_Harz2'] = pd.to_numeric(p['Temperatur_Heizen_unter_Harz2'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Stromdichte_Abtropfen'] = pd.to_numeric(p['Stromdichte_Abtropfen'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Temperatur_Abtropfen'] = pd.to_numeric(p['Temperatur_Abtropfen'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Stromdichte_Härten1'] = pd.to_numeric(p['Stromdichte_Härten1'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Temperatur_Härten1'] = pd.to_numeric(p['Temperatur_Härten1'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Stromdichte_Härten2'] = pd.to_numeric(p['Stromdichte_Härten2'] .astype(str).str.replace(',', '.'), downcast='float')
+    p['Temperatur_Härten2'] = pd.to_numeric(p['Temperatur_Härten2'] .astype(str).str.replace(',', '.'), downcast='float') 
+    p['Zeitstempel'] = pd.to_datetime(p['Zeitstempel'].astype(str).str.replace('_', '-'),format='%d-%m-%Y')
+    
+    for row in p.itertuples():
+      cursor.execute('''
                 INSERT INTO dbo.Impreagnieranlage_Rezeptdaten (Anlagentyp, Anlagennummer, Statorplatz, Rezepturdatensatz, Querschnitt, Kaltwiderstand,
     Toleranz_Kaltwiderstand, Stromdichte_Vorwärmen1, Temperatur_Vorwärmen1, Sollzeit_Vorwärmen1,  
     Stromdichte_Vorwärmen2, Temperatur_Vorwärmen2,Sollzeit_Vorwärmen2, Stromdichte_Vorwärmen3,  
@@ -78,20 +78,13 @@ for row in dfs.itertuples():
                  row.Temperatur_Abtropfen, row.Sollzeit_Abtropfen, row.Stromdichte_Härten1, row.Temperatur_Härten1, row.Sollzeit_Härten1, row.Stromdichte_Härten2,
                  row.Temperatur_Härten2, row.Sollzeit_Härten2, row.Be_Entladeposition, row.Kontaktierposition, row.Eintauchposition, row.Vorwärmposition, row.Austachposition, 
                  row.Eintauchgeschwindigkeit, row.Austauchgeschwindigkeit, row.Position_Absaugkabine, row.Verfahrgeschwindigkeit_allgemein, row.Ofenzeit, 
-                 row.Materialnummer, row.Zeitstempel )
+                 row.Materialnummer, row.Zeitstempel)
 
-     conn.commit()
-    except Exception as Argument:
+      conn.commit()
+except Exception as Argument:
             filename1 = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
-            f = open("I:\Arbeitsgruppen\Traceability\Fehlerbehandlung\Impreagnieranlage_Rezeptdaten " + filename1+ ".txt", "a")
+            f = open(V.Impreagnieranlage_Rezeptdaten_02 + filename1+ ".txt", "a")
             f.write(str(Argument))
             f.write(f'{row}\n')
             f.close()
-
-conn.close()      
-  
-
-      
-       
-      
-    
+conn.close()
