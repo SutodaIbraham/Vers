@@ -41,7 +41,7 @@ try:
     conn.commit()
 except Exception as Argument:
             filename1 = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
-            f = open(V.Impreagnieranlage_Prozessdaten + filename1+ ".txt", "a")
+            f = open(V.Impreagnieranlage_Prozessdaten_01 + filename1+ ".txt", "a")
             f.write(f'{filename}\n')
             f.write(str(Argument))
             f.write(f'\n{row}\n')
