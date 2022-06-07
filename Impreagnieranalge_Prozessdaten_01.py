@@ -33,8 +33,8 @@ try:
     p['Iststrom_Stromwärme'] = pd.to_numeric(p['Iststrom_Stromwärme'] .astype(str).str.replace(',', '.'), downcast='float')
     p['Isttemperatur_Ofen'] = pd.to_numeric(p['Isttemperatur_Ofen'] .astype(str).str.replace(',', '.'), downcast='float')
 
- for row in p.itertuples():
-    cursor.execute('''INSERT INTO dbo.Impreagnieranlage_Prozessdaten (Solltemperatur_Stromwärme, Isttemperatur_Stromwärme, Iststrom_Stromwärme, Isttemperatur_Ofen, Materialnummer, 
+    for row in p.itertuples():
+     cursor.execute('''INSERT INTO dbo.Impreagnieranlage_Prozessdaten (Solltemperatur_Stromwärme, Isttemperatur_Stromwärme, Iststrom_Stromwärme, Isttemperatur_Ofen, Materialnummer, 
                    Datum)VALUES (?, ?, ?, ?, ?, ?)''', row.Solltemperatur_Stromwärme, row.Isttemperatur_Stromwärme,  row.Iststrom_Stromwärme, 
                                                       row.Isttemperatur_Ofen,  row.Materialnummer,  row.Datum)
 
